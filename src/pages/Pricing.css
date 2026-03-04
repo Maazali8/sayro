@@ -88,7 +88,7 @@
 }
 
 .plan-card:hover:not(.highlight) {
-    border-color: rgba(37, 99, 235, 0.4);
+    border-color: rgba(196, 151, 78, 0.4);
     box-shadow: var(--shadow);
 }
 
@@ -97,8 +97,8 @@
     top: -14px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    color: var(--accent-light);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 0.3rem 1rem;
@@ -124,9 +124,9 @@
 }
 
 .plan-icon.primary {
-    background: rgba(37, 99, 235, 0.15);
-    border-color: rgba(37, 99, 235, 0.3);
-    color: var(--primary);
+    background: rgba(196, 151, 78, 0.15);
+    border-color: rgba(196, 151, 78, 0.30);
+    color: var(--accent);
 }
 
 .plan-name {
@@ -228,7 +228,7 @@
 }
 
 .pricing-footer a {
-    color: var(--primary);
+    color: var(--accent);
     font-weight: 600;
     text-decoration: none;
 }

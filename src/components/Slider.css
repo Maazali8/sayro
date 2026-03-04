@@ -19,7 +19,7 @@
 .slider-value {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--primary);
+    color: var(--accent);
     min-width: 2.5rem;
     text-align: right;
 }
@@ -41,26 +41,27 @@
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--primary);
+    background: var(--accent);
     cursor: pointer;
-    box-shadow: 0 0 0 3px var(--primary-glow);
+    box-shadow: 0 0 0 3px var(--accent-glow);
     transition: var(--transition);
 }
 
 .slider-input::-webkit-slider-thumb:hover {
     transform: scale(1.2);
-    box-shadow: 0 0 0 5px var(--primary-glow);
+    box-shadow: 0 0 0 5px var(--accent-glow);
 }
 
 .slider-input::-moz-range-thumb {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    background: var(--primary);
+    background: var(--accent);
     cursor: pointer;
     border: none;
-    box-shadow: 0 0 0 3px var(--primary-glow);
+    box-shadow: 0 0 0 3px var(--accent-glow);
 }
+
 
 .slider-track-labels {
     display: flex;

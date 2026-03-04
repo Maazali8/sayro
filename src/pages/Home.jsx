@@ -361,7 +361,7 @@ const Home = () => {
                                     key={title}
                                     variants={fadeUp}
                                     custom={i}
-                                    whileHover={{ scale: 1.03, borderColor: 'var(--primary)', transition: { duration: 0.2 } }}
+                                    whileHover={{ scale: 1.03, borderColor: 'var(--accent)', transition: { duration: 0.2 } }}
                                 >
                                     <div className="usecase-icon"><Icon size={24} /></div>
                                     <h3 className="usecase-title">{title}</h3>
@@ -388,7 +388,7 @@ const Home = () => {
                                     key={step.num}
                                     variants={fadeUp}
                                     custom={i}
-                                    whileHover={{ borderColor: 'var(--primary)', y: -4, transition: { duration: 0.2 } }}
+                                    whileHover={{ borderColor: 'var(--accent)', y: -4, transition: { duration: 0.2 } }}
                                 >
                                     <motion.div
                                         className="step-number"
@@ -548,6 +548,10 @@ const Home = () => {
                                 <motion.div className="cta-orb cta-orb-2"
                                     animate={{ scale: [1, 1.2, 1] }}
                                     transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                                />
+                                <motion.div className="cta-orb-extra"
+                                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.7, 0.5] }}
+                                    transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
                                 />
                             </div>
                             <motion.div variants={fadeUp} custom={1}>

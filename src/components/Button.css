@@ -46,14 +46,17 @@
 
 /* Variants */
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    color: var(--accent-light);
     box-shadow: 0 4px 18px var(--primary-glow);
+    border: 1px solid rgba(247, 231, 206, 0.15);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
+    background: linear-gradient(135deg, #2e6157 0%, #1a3d35 100%);
     box-shadow: 0 8px 28px var(--primary-glow);
+    color: #f7e7ce;
 }
 
 .btn-primary:active {
@@ -67,9 +70,9 @@
 }
 
 .btn-secondary:hover {
-    border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.07);
-    color: var(--primary);
+    border-color: var(--accent);
+    background: rgba(196, 151, 78, 0.10);
+    color: var(--accent);
 }
 
 .btn-ghost {
@@ -95,14 +98,17 @@
 }
 
 .btn-accent {
-    background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--accent) 0%, #d4a85e 100%);
+    color: var(--primary);
+    font-weight: 700;
     box-shadow: 0 4px 18px var(--accent-glow);
 }
 
 .btn-accent:hover {
     transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
     box-shadow: 0 8px 24px var(--accent-glow);
+    color: var(--primary);
 }
 
 /* Icon */

@@ -122,7 +122,7 @@
 }
 
 .history-item:hover {
-    border-color: rgba(37, 99, 235, 0.3);
+    border-color: rgba(196, 151, 78, 0.3);
     box-shadow: var(--shadow-sm);
 }
 
@@ -156,8 +156,8 @@
 .history-voice-badge {
     font-size: 0.72rem;
     font-weight: 600;
-    background: rgba(37, 99, 235, 0.12);
-    color: var(--primary);
+    background: rgba(196, 151, 78, 0.12);
+    color: var(--accent);
     padding: 0.15rem 0.5rem;
     border-radius: 999px;
 }
@@ -186,15 +186,15 @@
 }
 
 .history-action-btn:hover {
-    color: var(--primary);
-    border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.07);
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(196, 151, 78, 0.08);
 }
 
 .history-action-btn.playing {
-    color: var(--primary);
-    border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(196, 151, 78, 0.10);
 }
 
 .history-action-btn.danger:hover {

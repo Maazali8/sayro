@@ -46,8 +46,8 @@
 }
 
 .settings-tab.active {
-    color: var(--primary);
-    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent);
+    background: rgba(196, 151, 78, 0.10);
 }
 
 /* Content panel */
@@ -77,15 +77,15 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
     font-size: 1.1rem;
-    color: #fff;
+    color: var(--accent-light);
     flex-shrink: 0;
-    box-shadow: 0 0 20px var(--primary-glow);
+    box-shadow: 0 0 20px var(--accent-glow);
 }
 
 .profile-avatar-name {
@@ -170,8 +170,8 @@
 }
 
 .theme-toggle-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 /* Toggle switch */
@@ -215,13 +215,13 @@
 }
 
 .toggle-label input:checked~.toggle-slider {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: var(--primary-light);
+    border-color: var(--primary-light);
 }
 
 .toggle-label input:checked~.toggle-slider::before {
     transform: translateX(20px);
-    background: #fff;
+    background: var(--accent-light);
 }
 
 /* Responsive */
