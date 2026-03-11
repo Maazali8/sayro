@@ -1,20 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Mic2, Play, Pause, Download, RotateCcw, Volume2 } from 'lucide-react';
 import AppLayout from '../layouts/AppLayout';
 import Button from '../components/Button';
 import { TextArea } from '../components/Input';
 import Slider from '../components/Slider';
-import { ttsService } from '../services/ttsService';
+import { ttsService, POLLY_VOICES } from '../services/ttsService';
 import { useToast } from '../contexts/ToastContext';
 import './Dashboard.css';
 
 const VOICES = [
-    { id: 'aria', label: 'Aria', desc: 'Warm, professional female' },
-    { id: 'james', label: 'James', desc: 'Deep, confident male' },
-    { id: 'luna', label: 'Luna', desc: 'Soft, calm female' },
-    { id: 'ethan', label: 'Ethan', desc: 'Energetic young male' },
-    { id: 'nova', label: 'Nova', desc: 'Clear, neutral female' },
-    { id: 'ryan', label: 'Ryan', desc: 'Friendly, casual male' },
+    { id: 'aria', label: 'Aria', desc: POLLY_VOICES.aria.desc },
+    { id: 'james', label: 'James', desc: POLLY_VOICES.james.desc },
+    { id: 'luna', label: 'Luna', desc: POLLY_VOICES.luna.desc },
+    { id: 'ethan', label: 'Ethan', desc: POLLY_VOICES.ethan.desc },
+    { id: 'nova', label: 'Nova', desc: POLLY_VOICES.nova.desc },
+    { id: 'ryan', label: 'Ryan', desc: POLLY_VOICES.ryan.desc },
 ];
 
 const LANGUAGES = [
@@ -30,7 +30,14 @@ const LANGUAGES = [
     { value: 'hi-IN', label: 'Hindi' },
 ];
 
-const MAX_CHARS = 5000;
+const MAX_CHARS = 3000; // Puter.js / AWS Polly limit
+
+const fmtTime = (secs) => {
+    if (!secs || !isFinite(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+};
 
 const Dashboard = () => {
     const { addToast } = useToast();
@@ -43,39 +50,97 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
     const [playing, setPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);       // 0–100
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
 
+    // ── Generate ───────────────────────────────────────────────────────────────
     const handleGenerate = async () => {
         if (!text.trim()) { addToast('Please enter some text first.', 'error'); return; }
         if (text.length > MAX_CHARS) { addToast(`Text exceeds ${MAX_CHARS} characters.`, 'error'); return; }
 
         setLoading(true);
         setResult(null);
+        setPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
+
         try {
             const data = await ttsService.generate(text, voice, language, speed);
             setResult(data);
-            addToast('Audio generated successfully! 🎵', 'success');
-        } catch {
-            addToast('Generation failed. Please try again.', 'error');
+            addToast('Audio generated! 🎵 Click Play to listen.', 'success');
+        } catch (err) {
+            console.error(err);
+            addToast('Generation failed. Make sure you are signed into Puter.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
+    // ── Audio event handlers ───────────────────────────────────────────────────
+    const handleTimeUpdate = useCallback(() => {
+        const el = audioRef.current;
+        if (!el) return;
+        setCurrentTime(el.currentTime);
+        if (el.duration && isFinite(el.duration)) {
+            setProgress((el.currentTime / el.duration) * 100);
+        }
+    }, []);
+
+    const handleLoadedMetadata = useCallback(() => {
+        const el = audioRef.current;
+        if (el && isFinite(el.duration)) {
+            setDuration(el.duration);
+        }
+    }, []);
+
+    const handleEnded = useCallback(() => {
+        setPlaying(false);
+        setProgress(100);
+    }, []);
+
+    // ── Play / Pause ───────────────────────────────────────────────────────────
     const handlePlayPause = () => {
-        if (!audioRef.current) return;
+        const el = audioRef.current;
+        if (!el) return;
         if (playing) {
-            audioRef.current.pause();
+            el.pause();
             setPlaying(false);
         } else {
-            audioRef.current.play();
+            el.play();
             setPlaying(true);
         }
     };
 
+    // ── Seek via progress bar click ────────────────────────────────────────────
+    const handleSeek = (e) => {
+        const el = audioRef.current;
+        if (!el || !el.duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        el.currentTime = ratio * el.duration;
+    };
+
+    // ── Download ───────────────────────────────────────────────────────────────
+    const handleDownload = () => {
+        if (!result?.url) return;
+        const a = document.createElement('a');
+        a.href = result.url;
+        a.download = `voicegen-${result.id}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    // ── Reset ──────────────────────────────────────────────────────────────────
     const handleReset = () => {
-        if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
+        if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ''; }
         setResult(null);
         setPlaying(false);
+        setProgress(0);
+        setCurrentTime(0);
+        setDuration(0);
         setText('');
     };
 
@@ -97,7 +162,7 @@ const Dashboard = () => {
                     <div className="tts-input-panel glass">
                         <TextArea
                             label="Your Text"
-                            placeholder="Type or paste your text here... (up to 5,000 characters)"
+                            placeholder="Type or paste your text here... (up to 3,000 characters)"
                             value={text}
                             onChange={(e) => setText(e.target.value)}
                             count={text.length}
@@ -143,7 +208,7 @@ const Dashboard = () => {
                                 </select>
                             </div>
 
-                            {/* Speed */}
+                            {/* Speed (visual only — AWS Polly neural doesn't support rate via Puter.js) */}
                             <Slider
                                 label="Speed"
                                 min={0.5}
@@ -166,7 +231,7 @@ const Dashboard = () => {
                             onClick={handleGenerate}
                             disabled={!text.trim() || text.length > MAX_CHARS}
                         >
-                            {loading ? 'Generating...' : 'Generate Audio'}
+                            {loading ? 'Generating…' : 'Generate Audio'}
                         </Button>
                     </div>
 
@@ -174,8 +239,27 @@ const Dashboard = () => {
                     <div className="tts-output-panel">
                         {result ? (
                             <div className="audio-result glass animate-fade">
+                                {/* Hidden audio element — real blob URL from Puter.js */}
+                                <audio
+                                    ref={audioRef}
+                                    src={result.url}
+                                    onTimeUpdate={handleTimeUpdate}
+                                    onLoadedMetadata={handleLoadedMetadata}
+                                    onEnded={handleEnded}
+                                    preload="metadata"
+                                    style={{ display: 'none' }}
+                                />
+
                                 <div className="audio-result-header">
-                                    <div className="audio-waveform-mini">{Array.from({ length: 20 }).map((_, i) => <span key={i} className="mini-bar" style={{ animationDelay: `${i * 0.07}s` }} />)}</div>
+                                    <div className="audio-waveform-mini">
+                                        {Array.from({ length: 20 }).map((_, i) => (
+                                            <span
+                                                key={i}
+                                                className={`mini-bar${playing ? ' active' : ''}`}
+                                                style={{ animationDelay: `${i * 0.07}s` }}
+                                            />
+                                        ))}
+                                    </div>
                                     <div className="audio-meta">
                                         <span className="audio-voice">{VOICES.find(v => v.id === result.voice)?.label || result.voice}</span>
                                         <span className="audio-dot">·</span>
@@ -189,23 +273,43 @@ const Dashboard = () => {
                                     "{result.text.length > 120 ? result.text.slice(0, 120) + '…' : result.text}"
                                 </p>
 
-                                <audio
-                                    ref={audioRef}
-                                    src={result.url}
-                                    onEnded={() => setPlaying(false)}
-                                    style={{ display: 'none' }}
-                                />
-
                                 <div className="audio-controls">
-                                    <button className="audio-play-btn" onClick={handlePlayPause} aria-label={playing ? 'Pause' : 'Play'}>
+                                    {/* Play / Pause */}
+                                    <button
+                                        className="audio-play-btn"
+                                        onClick={handlePlayPause}
+                                        aria-label={playing ? 'Pause' : 'Play'}
+                                    >
                                         {playing ? <Pause size={22} /> : <Play size={22} />}
                                     </button>
-                                    <div className="audio-progress-bar">
-                                        <div className="audio-progress-fill" style={{ width: playing ? '50%' : '0%' }} />
+
+                                    {/* Seekable progress bar + time */}
+                                    <div
+                                        className="audio-progress-bar"
+                                        onClick={handleSeek}
+                                        style={{ cursor: 'pointer' }}
+                                        title="Click to seek"
+                                    >
+                                        <div
+                                            className="audio-progress-fill"
+                                            style={{ width: `${progress}%`, transition: playing ? 'width 0.25s linear' : 'none' }}
+                                        />
                                     </div>
-                                    <a href={result.url} download={`voicegen-${result.id}.mp3`} className="audio-download-btn" aria-label="Download">
+
+                                    {/* Time display */}
+                                    <span className="audio-time">
+                                        {fmtTime(currentTime)}{duration > 0 ? ` / ${fmtTime(duration)}` : ''}
+                                    </span>
+
+                                    {/* Download button */}
+                                    <button
+                                        className="audio-download-btn"
+                                        onClick={handleDownload}
+                                        aria-label="Download"
+                                        title="Download MP3"
+                                    >
                                         <Download size={18} />
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         ) : (

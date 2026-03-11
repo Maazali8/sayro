@@ -42,16 +42,32 @@ const History = () => {
     });
 
     const handlePlay = (item) => {
+        if (!item.url) {
+            addToast('No audio available for this entry.', 'error');
+            return;
+        }
         if (playingId === item.id) {
             audioRef.current?.pause();
             setPlayingId(null);
         } else {
             if (audioRef.current) {
-                audioRef.current.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3`;
+                // Stop any currently playing audio first
+                audioRef.current.pause();
+                audioRef.current.src = item.url;
                 audioRef.current.play();
             }
             setPlayingId(item.id);
         }
+    };
+
+    const handleDownload = (item) => {
+        if (!item.url) return;
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.download = `voicegen-${item.id}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     const confirmDelete = async () => {
@@ -133,20 +149,21 @@ const History = () => {
                                 </div>
                                 <div className="history-actions">
                                     <button
-                                        className={`history-action-btn ${playingId === item.id ? 'playing' : ''}`}
+                                        className={`history-action-btn ${playingId === item.id ? 'playing' : ''}${!item.url ? ' disabled' : ''}`}
                                         onClick={() => handlePlay(item)}
-                                        title="Play"
+                                        title={item.url ? (playingId === item.id ? 'Pause' : 'Play') : 'No audio available'}
+                                        disabled={!item.url}
                                     >
                                         {playingId === item.id ? <Pause size={16} /> : <Play size={16} />}
                                     </button>
-                                    <a
-                                        href="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                                        download={`voicegen-${item.id}.mp3`}
-                                        className="history-action-btn"
-                                        title="Download"
+                                    <button
+                                        className={`history-action-btn${!item.url ? ' disabled' : ''}`}
+                                        onClick={() => handleDownload(item)}
+                                        title={item.url ? 'Download MP3' : 'No audio available'}
+                                        disabled={!item.url}
                                     >
                                         <Download size={16} />
-                                    </a>
+                                    </button>
                                     <button
                                         className="history-action-btn danger"
                                         onClick={() => setDeleteTarget(item)}

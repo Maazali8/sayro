@@ -164,6 +164,11 @@
     transform: scaleY(0.3);
     transform-origin: bottom;
     animation: waveform 1.4s ease-in-out infinite;
+    animation-play-state: paused;
+}
+
+.mini-bar.active {
+    animation-play-state: running;
 }
 
 .audio-meta {
@@ -239,11 +244,13 @@
     height: 36px;
     border-radius: 9px;
     border: 1px solid var(--border);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--muted);
     text-decoration: none;
+    cursor: pointer;
     transition: var(--transition);
     flex-shrink: 0;
 }
@@ -251,6 +258,14 @@
 .audio-download-btn:hover {
     color: var(--accent);
     border-color: var(--accent);
+}
+
+.audio-time {
+    font-size: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Placeholder */
